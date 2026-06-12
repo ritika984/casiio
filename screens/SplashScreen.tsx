@@ -1,122 +1,127 @@
-import React, { useState } from 'react';
-import {
-  View, Text, StyleSheet, SafeAreaView,
-  TextInput, TouchableOpacity, StatusBar, KeyboardAvoidingView, Platform,
-} from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Easing, Image, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import Colors from '../theme/colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import Colors from '../theme/colors'; // adjust path as needed
 
-const SplashScreen = () => {
-  const [studentName, setStudentName] = useState('');
-  const [rollNumber, setRollNumber] = useState('');
-  const [error, setError] = useState('');
-
-  const handleStart = () => {
-    if (!studentName.trim() || !rollNumber.trim()) {
-      setError('Please enter both name and roll number.');
-      return;
-    }
-    setError('');
-    router.push({ pathname: '/calculator', params: { studentName: studentName.trim(), rollNumber: rollNumber.trim() } });
-  };
-
-  return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.container}>
-
-        {/* Brand */}
-        <View style={styles.brandArea}>
-          <View style={styles.brandBar}>
-            <Text style={styles.brandText}>CASIO</Text>
-          </View>
-          <Text style={styles.modelText}>fx-991ES PLUS</Text>
-          <Text style={styles.subtitle}>Scientific Calculator</Text>
-        </View>
-
-        {/* Login card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Student Login</Text>
-
-          <Text style={styles.label}>Full Name</Text>
-          <TextInput
-            style={styles.input}
-            value={studentName}
-            onChangeText={setStudentName}
-            placeholder="Enter your name"
-            placeholderTextColor="#555"
-            autoCapitalize="words"
-          />
-
-          <Text style={styles.label}>Roll Number</Text>
-          <TextInput
-            style={styles.input}
-            value={rollNumber}
-            onChangeText={setRollNumber}
-            placeholder="Enter roll number"
-            placeholderTextColor="#555"
-            autoCapitalize="characters"
-          />
-
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-          <TouchableOpacity style={styles.startBtn} onPress={handleStart} activeOpacity={0.8}>
-            <Text style={styles.startBtnText}>START SESSION</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.footer}>Tribhuvan University • Institute of Engineering</Text>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
+const INFO = {
+  name:        'Ritika Shrestha',
+  roll:        'JEC080BCT011',
+  college:     'Janakpur Engineering College',
+  university:  'Tribhuvan University — IOE',
+  dept:        'B.E. Computer Engineering · Year III',
+  course:      'Computer Engineering',
+  appName:     'CasioCalc',
+  declaration: 'I declare that this application is my original and independent work. ',
 };
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  brandArea: { alignItems: 'center', marginBottom: 32 },
-  brandBar: {
-    backgroundColor: Colors.brandBlue,
-    paddingHorizontal: 28,
-    paddingVertical: 5,
-    borderRadius: 2,
-    marginBottom: 6,
-  },
-  brandText: { color: '#ffffff', fontSize: 28, fontWeight: '900', letterSpacing: 8 },
-  modelText: { color: '#cccccc', fontSize: 15, fontWeight: '600', letterSpacing: 2 },
-  subtitle: { color: '#888888', fontSize: 12, marginTop: 4 },
-  card: {
-    backgroundColor: Colors.calcBody,
-    borderRadius: 16,
-    padding: 24,
-    width: '100%',
-    maxWidth: 380,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  cardTitle: { color: '#ffffff', fontSize: 16, fontWeight: '700', marginBottom: 18, textAlign: 'center' },
-  label: { color: '#aaaaaa', fontSize: 12, fontWeight: '600', marginBottom: 6 },
-  input: {
-    backgroundColor: Colors.background,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    color: '#ffffff',
-    fontSize: 15,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 14,
-  },
-  errorText: { color: '#ff6666', fontSize: 12, marginBottom: 10, textAlign: 'center' },
-  startBtn: {
-    backgroundColor: Colors.brandBlue,
-    borderRadius: 10,
-    paddingVertical: 13,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  startBtnText: { color: '#ffffff', fontSize: 15, fontWeight: '800', letterSpacing: 2 },
-  footer: { color: '#444466', fontSize: 11, marginTop: 28, textAlign: 'center' },
-});
+const HAS_PHOTO = false;
 
-export default SplashScreen;
+const HOLD_MS = 3500;
+const FADE_MS = 500;
+
+export default function SplashScreen() {
+  const opacity  = useRef(new Animated.Value(0)).current;
+  const scale    = useRef(new Animated.Value(0.94)).current;
+  const logoSpin = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity,  { toValue:1, duration:450, easing:Easing.out(Easing.ease),      useNativeDriver:true }),
+      Animated.timing(scale,    { toValue:1, duration:550, easing:Easing.out(Easing.back(1.3)), useNativeDriver:true }),
+      Animated.timing(logoSpin, { toValue:1, duration:650, easing:Easing.out(Easing.ease),      useNativeDriver:true }),
+    ]).start();
+
+    const timer = setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(opacity, { toValue:0, duration:FADE_MS, easing:Easing.in(Easing.ease), useNativeDriver:true }),
+        Animated.timing(scale,   { toValue:0.97, duration:FADE_MS, easing:Easing.in(Easing.ease), useNativeDriver:true }),
+      ]).start(() => router.replace('/calculator' as any));
+    }, HOLD_MS);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const spin = logoSpin.interpolate({ inputRange:[0,1], outputRange:['-15deg','0deg'] });
+
+  return (
+    <Animated.View style={[st.screen, { opacity }]}>
+      <SafeAreaView style={st.safe} edges={['top','bottom']}>
+        <Animated.View style={[st.card, { transform:[{ scale }] }]}>
+
+          {/* Logo */}
+          <Animated.View style={[st.logoRing, { transform:[{ rotate:spin }] }]}>
+            <Ionicons name="calculator" size={36} color={Colors.shiftLabel} />
+          </Animated.View>
+          <Text style={st.appName}>{INFO.appName}</Text>
+          <Text style={st.appSub}>{INFO.appSub}</Text>
+
+          <View style={st.divider} />
+
+          {/* Author */}
+          <View style={st.authorRow}>
+            <View style={st.photoRing}>
+              {HAS_PHOTO
+                ? <Image source={require('../assets/images/photo.jpg')} style={{ width:74, height:74, borderRadius:37 }} />
+                : <View style={st.photoFill}><Ionicons name="person" size={30} color={Colors.shiftLabel} /></View>
+              }
+            </View>
+            <View style={st.authorInfo}>
+              <Text style={st.authorName}>{INFO.name}</Text>
+              <Text style={st.rollNo}>{INFO.roll}</Text>
+              <Text style={st.college}>{INFO.college}</Text>
+              <Text style={st.university}>{INFO.university}</Text>
+            </View>
+          </View>
+
+          <View style={st.divider} />
+
+          <View style={st.metaRow}>
+            <Ionicons name="construct-outline" size={12} color={Colors.shiftLabel} />
+            <Text style={st.metaText}>{INFO.dept}</Text>
+          </View>
+          <View style={[st.metaRow, { marginTop:5 }]}>
+            <Ionicons name="book-outline" size={12} color={Colors.shiftLabel} />
+            <Text style={st.metaText}>{INFO.course}</Text>
+          </View>
+
+          <View style={st.divider} />
+
+          <View style={st.declarationBox}>
+            <Ionicons name="shield-checkmark-outline" size={15} color={Colors.shiftLabel} style={{ marginBottom:5 }} />
+            <Text style={st.declarationText}>
+              "I declare that this application is my original{'\n'}and independent work."
+            </Text>
+          </View>
+
+          <Text style={st.footer}>Mini Project · 2082 B.S.</Text>
+
+        </Animated.View>
+      </SafeAreaView>
+    </Animated.View>
+  );
+}
+
+const st = StyleSheet.create({
+  screen:          { flex:1, backgroundColor:Colors.background, justifyContent:'center' },
+  safe:            { flex:1, justifyContent:'center', paddingHorizontal:22 },
+  card:            { backgroundColor:Colors.calcBody, borderRadius:16, padding:22, borderWidth:1, borderColor:Colors.border },
+  logoRing:        { width:68, height:68, borderRadius:18, backgroundColor:Colors.background, borderWidth:2, borderColor:Colors.shiftLabel, justifyContent:'center', alignItems:'center', alignSelf:'center', marginBottom:10 },
+  appName:         { color:Colors.shiftLabel, fontSize:26, fontWeight:'700', letterSpacing:4, textAlign:'center' },
+  appSub:          { color:Colors.displaySecondary, fontSize:11, letterSpacing:1, textAlign:'center', marginTop:2 },
+  authorRow:       { flexDirection:'row', alignItems:'center', gap:12 },
+  photoRing:       { width:80, height:80, borderRadius:40, borderWidth:2, borderColor:Colors.shiftLabel, padding:3, overflow:'hidden' },
+  photoFill:       { width:74, height:74, borderRadius:37, backgroundColor:Colors.background, justifyContent:'center', alignItems:'center' },
+  authorInfo:      { flex:1 },
+  authorName:      { color:Colors.keyDefaultText, fontSize:16, fontWeight:'700' },
+  rollNo:          { color:Colors.shiftLabel, fontSize:12, fontWeight:'600', letterSpacing:1, marginTop:2 },
+  college:         { color:Colors.border, fontSize:11, marginTop:3 },
+  university:      { color:Colors.border, fontSize:10, marginTop:1 },
+  metaRow:         { flexDirection:'row', alignItems:'center', gap:6 },
+  metaText:        { color:Colors.border, fontSize:11 },
+  declarationBox:  { backgroundColor:Colors.background, borderRadius:8, padding:12, alignItems:'center', borderWidth:1, borderColor:Colors.keyMode },
+  declarationText: { color:Colors.border, fontSize:12, lineHeight:18, textAlign:'center', fontStyle:'italic' },
+  divider:         { height:1, backgroundColor:Colors.border, marginVertical:13 },
+  footer:          { color:Colors.screenTop, fontSize:10, textAlign:'center', marginTop:12 },
+});
